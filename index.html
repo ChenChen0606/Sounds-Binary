@@ -4,65 +4,93 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sound to Binary Converter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <main>
-<h1>&#9825; Sound to Binary Converter &#9825;</h1>
-<p class="who">Name: <strong>Gretchen Tumilap</strong> &nbsp;|&nbsp; Section: <strong>33</strong></p>
 
-<section aria-labelledby="h-in">
-  <h2 id="h-in">&#10024; Wave settings</h2>
+<header>
+  <h1>Sound to Binary Converter</h1>
+  <p class="who">Name: <strong>Gretchen Tumilap</strong> &nbsp;|&nbsp; Section: <strong>33</strong></p>
+</header>
+
+<!-- Stage 1: inputs and Convert button -->
+<section>
+  <h2>Wave settings</h2>
   <div class="inputs">
     <label>Frequency (Hz)<input id="freq" type="number" value="1000" step="any"></label>
-    <label>Amplitude (0 to 1)<input id="amp" type="number" value="1" step="any"></label>
-    <label>Number of samples<input id="n" type="number" value="4" step="any"></label>
-    <label>Bits per sample<input id="bits" type="number" value="2" step="any"></label>
+    <label>Amplitude <small>0 to 1</small><input id="amp" type="number" value="1" step="any"></label>
+    <label>Samples <small>2 to 64</small><input id="n" type="number" value="4" step="any"></label>
+    <label>Bits per sample <small>1 to 8</small><input id="bits" type="number" value="2" step="any"></label>
   </div>
   <div class="btns">
     <button id="convert" type="button">Convert</button>
     <button id="play" class="play" type="button">Play tone (1 s)</button>
   </div>
-  <div id="warn" role="alert"></div>
+  <div id="warn" role="alert" aria-live="assertive"></div>
 </section>
 
+<!-- Results: hidden until Convert is pressed with valid numbers -->
 <div id="out" hidden>
-<section aria-labelledby="h-wave">
-  <h2 id="h-wave">&#127800; Wave facts</h2>
-  <div class="facts">
-    <div class="fact"><b>Amplitude</b><span id="fa"></span></div>
-    <div class="fact"><b>Frequency</b><span id="ff"></span></div>
-    <div class="fact"><b>Period</b><span id="fp"></span></div>
-    <div class="fact"><b>Wavelength</b><span id="fw"></span></div>
-  </div>
-  <canvas id="cv" aria-label="One wave cycle with its samples marked"></canvas>
-  <p class="note">Each pink dot is one sample. The line from the middle to the dot shows how high or low the wave is at that moment.</p>
-</section>
+  <section>
+    <h2>Wave facts</h2>
+    <div class="facts">
+      <div class="fact"><b>Amplitude</b><span id="fa"></span></div>
+      <div class="fact"><b>Frequency</b><span id="ff"></span></div>
+      <div class="fact"><b>Period</b><span id="fp"></span></div>
+      <div class="fact"><b>Wavelength</b><span id="fw"></span></div>
+    </div>
+    <div class="scope">
+      <canvas id="cv" aria-label="One wave cycle with the samples marked"></canvas>
+      <div class="legend">
+        <span><i style="background:#ff7eb6"></i>Sample</span>
+        <span><i style="background:transparent;border:2px solid #fff"></i>Rounded to its level</span>
+      </div>
+    </div>
+  </section>
 
-<section aria-labelledby="h-tab">
-  <h2 id="h-tab">&#128157; Samples</h2>
-  <div class="tablewrap"><table id="tbl"></table></div>
-  <span class="bin" id="bin"></span>
-  <p><strong>Total bits:</strong> <span id="total"></span></p>
-</section>
+  <section>
+    <h2>Samples and binary</h2>
+    <div class="tablewrap"><table id="tbl"></table></div>
+    <p class="bin-label">Binary result</p>
+    <span class="bin" id="bin"></span>
+    <p class="total"><strong>Total bits:</strong> <span id="total"></span></p>
+  </section>
 </div>
 
-<section aria-labelledby="h-test">
-  <h2 id="h-test">&#128141; Test Results</h2>
-  <p class="note">Each row is produced by the same code as the converter above.</p>
+<!-- Stage 6: Test Results -->
+<section>
+  <h2>Test Results</h2>
+  <p class="testnote">These rows come from the same code as the converter above.</p>
   <div class="tablewrap"><table id="tests"></table></div>
 </section>
 
-<section aria-labelledby="h-exp">
-  <h2 id="h-exp">&#127872; Explain It</h2>
-  <div class="q"><p><strong>1.</strong> In your own words, how does your app change a sound wave into binary?</p><p class="a">My app reads the four numbers and first checks they are valid. Then it works out the period (1000 / frequency, in ms) and the wavelength (343 / frequency, in m). Next it takes the samples at evenly spaced times across one wave. For each sample it finds the wave height with amplitude &times; sin(2&pi; &times; i / samples). That height, from -1 to 1, is rounded to a whole level from 0 to (2<sup>bits</sup> &minus; 1). Finally the level is written as binary with the right number of bits, and all the samples are joined into one line.</p></div>
-  <div class="q"><p><strong>2.</strong> Run Test A with 2 bits, then 6 bits. Which gives more detail about the wave, and why?</p><p class="a">With 2 bits there are only 4 levels, so Test A's samples land on just three of them (10, 11, 11, 11, 10, 00, 00, 00) and the wave looks like big blocky steps. With 6 bits there are 64 levels, and the same samples become 32, 54, 63, 54, 32, 9, 0, 9, which follows the real curve much more closely. More bits means more levels, so each sample is rounded less and the wave keeps more detail.</p></div>
-  <div class="q"><p><strong>3.</strong> Which test has the longest binary result, and why?</p><p class="a">Test A has the longest binary result. It has 8 samples at 3 bits each, so it makes 24 bits. Tests B and C only make 8 bits. The total is always samples &times; bits, so more samples or more bits makes the binary longer.</p></div>
-  <div class="q"><p><strong>4.</strong> What was the hardest step to build, and how did you fix it?</p><p class="a">The hardest part was rounding to the right level. The sine of some angles came out as a tiny number like 0.0000000000000001 instead of exactly 0, which sometimes pushed a level to the wrong side of a rounding point. I fixed it by rounding the amplitude to 9 decimal places before finding the level. After that my results matched the Check Your Work table.</p></div>
+<!-- Stage 6: Explain It -->
+<section>
+  <h2>Explain It</h2>
+  <div class="q">
+    <p>1. In your own words, how does your app change a sound wave into binary?</p>
+    <p class="a">It works in three steps: it samples the wave's height at equal time steps, rounds each height to the nearest level, and then writes each level in binary with leading zeros.</p>
+  </div>
+  <div class="q">
+    <p>2. Run Test A again with 2 bits, then 6 bits. Which gives more detail about the wave, and why?</p>
+    <p class="a">6 bits gives more detail because it has 64 levels instead of 4, so each sample is rounded less and the binary follows the wave's height more closely. It also uses more bits.</p>
+  </div>
+  <div class="q">
+    <p>3. Which test has the longest wavelength? How is wavelength connected to frequency?</p>
+    <p class="a">Test B (200 Hz) has the longest wavelength, 1.72 m. Wavelength is 343 &divide; frequency, so a higher frequency gives a shorter wavelength.</p>
+  </div>
+  <div class="q">
+    <p>4. What was the hardest stage to build, and how did you fix it?</p>
+    <p class="a">Stage 4 (the level and binary) was the hardest, because tiny decimal errors like 0.00000000000000012 sometimes gave the wrong level. I fixed it by rounding the height to 9 decimal places before finding the level.</p>
+  </div>
 </section>
+
 </main>
 
 <script src="script.js"></script>
-
 </body>
 </html>
